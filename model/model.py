@@ -38,25 +38,25 @@ class Model:
         self._bestPath = []
         self._bestDimensione = 0
         partenza = self._idMap[idPartenza]
-        self._ricorsione(partenza, [(partenza, partenza.Bytes)], dimensioneMax)
+        self._connessa = list(nx.node_connected_component(self._grafo, partenza))
+        self._ricorsione(partenza, [(partenza, partenza.Bytes)], dimensioneMax, 0)
         return self._bestPath, self._bestDimensione
 
-    def _ricorsione(self, nodo, parziale, dimensioneMax):
+    def _ricorsione(self, nodo, parziale, dimensioneMax, pos):
         memoriaParziale = self.getMemoriaParziale(parziale)
         if len(parziale) > 0:
             if memoriaParziale < dimensioneMax:
-                if len(parziale) > len(self._bestPath) and memoriaParziale > self._bestDimensione:
+                if len(parziale) > len(self._bestPath):  # and memoriaParziale > self._bestDimensione: sbagliato, conta la lunghezza di parziale
                     self._bestDimensione = memoriaParziale
                     self._bestPath = copy.deepcopy(parziale)
-            else:
+            elif memoriaParziale > dimensioneMax:
                 return
-
-        vicini = self._grafo.neighbors(nodo)
-        for v in vicini:
+        for v in self._connessa[pos:]:
+            pos += 1
             if self.filtroNodi(v, parziale):
                 dimV = v.Bytes
                 parziale.append((v, dimV))
-                self._ricorsione(v, parziale, dimensioneMax)
+                self._ricorsione(v, parziale, dimensioneMax, pos)
                 parziale.pop()
 
     def filtroNodi(self, v, parziale):

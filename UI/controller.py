@@ -39,6 +39,7 @@ class Controller:
             self.choiceCanzone = None
         else:
             self.choiceCanzone = e.control.data
+            print(self.choiceCanzone)
 
     def handle_delta(self, e):
         canzoniDurataMax = self._model.durataMax()
